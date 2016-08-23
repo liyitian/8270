@@ -7,5 +7,8 @@ namespace Pokemon {
 
 int main() {
   int pokedex = 0;
+  std::cout << pokedex << std::endl;
+  std::cout << Pokemon::pokedex << std::endl;
+  std::cout << ::pokedex << std::endl;
   return 0;
 }
