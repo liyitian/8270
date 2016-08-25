@@ -9,7 +9,7 @@ public:
      strcpy(buf, s.buf); 
     }
    ~string() { delete [] buf; }
-   char* getBuf() const { return buf; }
+   const char* getBuf() { buf = '\0'; return buf; }
    void setBuf(const char* s) {
      delete [] buf;
      buf = new char[strlen(s)+1];
@@ -23,9 +23,12 @@ public:
 private:
    char * buf;
 };
+std::ostream& operator<<(std::ostream& out, const string& s) {
+  return out << s.getBuf();
+}
 
 int main() {
   string a("cat"), b = a;
   b.setBuf("dog");
-  std::cout << a.getBuf() << std::endl;
+  std::cout << a << std::endl;
 }
