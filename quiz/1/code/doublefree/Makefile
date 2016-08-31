@@ -1,16 +1,20 @@
+CXX = g++
+# Warnings frequently signal eventual errors:
+CXXFLAGS= -g -W -Wall -Weffc++ -Wextra -pedantic -O0
+LDFLAGS = -lm
 
-CC = g++
-LIB = -lSDL -lm -lstdc++
-OBJ = 	main.o
-FLAGS = -Wall -c -ggdb
-EXE = run
+OBJS = \
+	main.o
+EXEC = run
 
-$(EXE): $(OBJ)
-	$(CC) $(OBJ) $(LIB)  -o $(EXE)
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-.c.cpp.o: $.h
-	$(CC) $(FLAGS) $< 
-	
+$(EXEC): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJS) $(LDFLAGS)
+
+main.o: main.cpp
+
 clean:
-	 rm -rf *.o $(EXE)
-
+	rm -rf $(OBJS)
+	rm -rf $(EXEC)
