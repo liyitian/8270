@@ -6,13 +6,13 @@ else
 endif
 
 # Warnings frequently signal eventual errors:
-CXXFLAGS=`sdl-config --cflags` -g -W -Wall -Weffc++ -Wextra -pedantic -O0
+CXXFLAGS= -g -W -Wall -Weffc++ -Wextra -pedantic -O0
 
 ifeq ("$(shell uname)", "Darwin")
   LDFLAGS = -lm
 else
   ifeq ("$(shell uname)", "Linux")
-  LDFLAGS = `sdl-config --libs` -lm 
+  LDFLAGS =  -lm 
   endif
 endif
 
