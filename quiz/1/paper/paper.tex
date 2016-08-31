@@ -1,0 +1,161 @@
+\documentclass[times, 11pt]{article}
+\usepackage{times}
+\usepackage{txfonts}
+\usepackage{wrapfig}
+\usepackage{url}
+\usepackage{listings}
+
+% The next command must come after the \usepackage{latex/latex8}
+\usepackage[top=1.0in, bottom=1.0in, left=1.0in, right=1.0in]{geometry}
+
+\ifx\pdfoutput\undefined
+  \usepackage[dvips]{graphicx}
+  \usepackage[dvips,dvipsnames]{color}
+\else
+  \usepackage[pdftex]{graphicx}
+  \usepackage[pdftex,dvipsnames]{color}
+
+  \pdfinfo {
+	/Author (Brian A. Malloy)
+	/Title (Quiz: 4160/6160)
+}
+\fi
+
+\def\figline{\rule{\textwidth}{0.3mm}}
+\def\shortline{\hrulefill}
+\newcommand{\cpp}{$C^{++}$}
+\newcommand{\CPP}{$C^{++}$}
+
+
+\newenvironment{packedEnum}{
+\begin{enumerate}
+  \setlength{\itemsep}{1pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
+}{\end{enumerate}}
+
+\newenvironment{packedItem}{
+\begin{itemize}
+  \setlength{\itemsep}{1pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
+}{\end{itemize}}
+
+\begin{document}
+
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\lstset{
+%basicstyle=\footnotesize,
+%frame=single,
+numbers=left,
+numberstyle=\color{mygray}
+}
+
+%don't want date printed
+\date{}
+
+
+\bibliographystyle{plain}
+
+
+\baselineskip = 16pt
+\pagenumbering{arabic}
+
+\begin{enumerate}
+
+%\item
+%(10 points)
+%Give the output for the following program:
+%\begin{lstlisting}
+%\end{lstlisting}
+%\vspace{0.5in}
+
+\item
+(10 points)
+Give the output for the following program:
+{\footnotesize
+\lstinputlisting{../code/leak/main.cpp}
+}
+
+\vspace{0.5in}
+\figline
+
+
+\item
+(10 points)
+Give the output for the following program:
+{\footnotesize
+\lstinputlisting{../code/ternary/main.cpp}
+}
+
+\newpage
+
+\item
+(10 points)
+Give the output for the following program:
+{\footnotesize
+\lstinputlisting{../code/construct/main.cpp}
+}
+
+\vspace{0.5in}
+\figline
+
+\item
+(10 points)
+The following program crashes with a double free error. Explain why.
+
+{\footnotesize
+\lstinputlisting{../code/doublefree/main.cpp}
+}
+
+\newpage
+
+\item
+(10 points)
+Give the output for the following program.
+
+{\footnotesize
+\lstinputlisting{../code/initorder/main.cpp}
+}
+
+\vspace{0.5in}
+\figline
+
+\item
+(10 points)
+The following program compiles and executes but gives a warning.
+Give the output for the program. The warning given by {\sf g++} is:
+
+{\footnotesize
+\begin{verbatim}
+main.cpp:3:21: warning: parameter ‘x’ set but not used [-Wunused-but-set-parameter]
+ void initialize(int x, int y) {
+                     ^
+main.cpp:3:28: warning: parameter ‘y’ set but not used [-Wunused-but-set-parameter]
+ void initialize(int x, int y) {
+                            ^
+\end{verbatim}
+}
+
+\lstinputlisting{../code/byvalue/main.cpp}
+
+\newpage
+
+\item
+(40 points)
+The {\sf rule of three} states that for a class that contains
+dynamically allocated data attributes (pointers), the programmer
+should write a destructor, a copy constructor, and an assignment
+operator.
+Write a class, {\sf Student}, that contains a single data attribute:
+{\sf char* name}.
+Write all three constructors and any addional functions needed to
+fulfill the {\sf rule of three}. 
+Also, overload an output operator for class {\sf Student}, including
+any accessor functions needed (getters).
+
+\end{enumerate}
+
+\bibliography{bib/paper}
+
+\end{document}
