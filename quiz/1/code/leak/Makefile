@@ -9,10 +9,10 @@ endif
 CXXFLAGS=`sdl-config --cflags` -g -W -Wall -Weffc++ -Wextra -pedantic -O0
 
 ifeq ("$(shell uname)", "Darwin")
-  LDFLAGS = -framework Foundation -framework GLUT -framework OpenGL -lm
+  LDFLAGS = -lm
 else
   ifeq ("$(shell uname)", "Linux")
-  LDFLAGS = `sdl-config --libs` -lm -lSDL_ttf -lSDL_image -lexpat
+  LDFLAGS = -lm 
   endif
 endif
 
