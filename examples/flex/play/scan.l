@@ -5,8 +5,8 @@
 word      [a-zA-Z]+
 
 %%
-{word}        { ++words; }
-.             { }
+([A-Z]|[a-z])+   { std::cout << "matched: " << yytext << std::endl; }
+.                { }
 %%
 int yywrap() { return 1; }
 
