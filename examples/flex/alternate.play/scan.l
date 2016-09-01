@@ -9,5 +9,5 @@ word      [a-zA-Z]+
                    std::cout << "matched: " << yytext << std::endl; }
 .                { }
 %%
-int yyFlexLexer::yywrap() { return 1; }
+int yywrap() { return 1; }
 

@@ -1,13 +1,12 @@
 #include <iostream>
-#include <FlexLexer.h>
+int yylex();
 
 extern int words;
 extern int lines;
 extern int chars;
 
 int main() {
-  FlexLexer* lexer = new yyFlexLexer;
-  lexer->yylex();
+  yylex();
   std::cout << "words: " << words << std::endl;
   return 0;
 }
