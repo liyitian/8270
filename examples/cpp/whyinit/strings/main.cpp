@@ -12,6 +12,13 @@ public:
   }
 };
 
+class Test {
+public:
+  Test( const char* n ) : name(n) { }
+private:
+  string name;
+};
+
 int main() {
-  string s;
+  Test t("Billy the Kid");
 }
