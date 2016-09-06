@@ -2,11 +2,12 @@
 #include <iostream>
   int words = 0;
 %}
-word      [a-zA-Z]+
+letter      [a-zA-Z]
 
 %%
-([A-Z]|[a-z])+   { std::cout << "matched: " << yytext << std::endl; }
-.                { }
+a*b*          { std::cout << "Match" << std::endl; }
+{letter}*     { std::cout << "no match" << std::endl; }
+.             { }
 %%
 int yywrap() { return 1; }
 

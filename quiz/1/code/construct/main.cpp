@@ -11,5 +11,6 @@ public:
   }
 };
 int main() {
-  string x("cat"), y = x;
+  string x("cat"), y;
+  y = x;
 }
