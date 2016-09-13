@@ -1,7 +1,7 @@
 CXX = g++
 LEX = flex
 CXXFLAGS = -Wall
-LEXFLAGS =
+LEXFLAGS = -Wno-unused
 
 OBJS = main.o lex.yy.o
 
