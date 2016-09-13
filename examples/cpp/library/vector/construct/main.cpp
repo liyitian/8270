@@ -5,15 +5,11 @@
 
 class Number {
 public:
-  Number() : number(0) {
-    std::cout << "default" << std::endl;
-  }
-  Number(int n) : number(n) {
-    std::cout << "convert" << std::endl;
-  }
-  Number(const Number& a) : number(a.number) {
-    std::cout << "copy" << std::endl;
-  }
+  Number() : number(0) { std::cout << "default: " << number << std::endl; }
+  Number(int n) : number(n) { 
+    std::cout << "convert: " << number << std::endl; }
+  Number(const Number& a) : number(a.number) { 
+    std::cout << "copy: " << number << std::endl; }
   Number& operator=(const Number& rhs) {
     if ( this != &rhs ) {
       number = rhs.number;
@@ -34,5 +30,11 @@ void print(const std::vector<Number> & vec) {
 }
 
 int main() {
-  std::vector<Number> vec(10);
+  std::vector<Number> vec;
+  vec.reserve(4);
+  for (int i = 0; i < 4; ++i) {
+    vec.push_back( Number(i) );
+  }
+  std::cout << "size: " << vec.size() << std::endl;
+  std::cout << "cap: " << vec.capacity() << std::endl;
 }
