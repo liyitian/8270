@@ -6,6 +6,7 @@ class Shape {
 public:
   Shape(const std::string& n) : name(n) {}
   const std::string& getName() const { return name; }
+  virtual int perimeter() const { return 0; }
   virtual float area() const = 0;
 private:
   std::string name;
@@ -25,5 +26,6 @@ void printArea(const Shape* s) {
 }
 
 int main() {
-  printArea(new Circle("circle", 5.0));
+  Shape* circle = new Circle("circle", 5.0);
+  printArea( circle );
 }
