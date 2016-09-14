@@ -1,4 +1,5 @@
 #include <iostream>
+
 class string {
 public:
   string()              { std::cout << "default" << std::endl;    }
@@ -10,7 +11,14 @@ public:
     return *this;
   }
 };
+
+class Test {
+public:
+  Test( const char* n ) : name(n) { }
+private:
+  string name;
+};
+
 int main() {
-  string x("cat"), y;
-  y = x;
+  Test t("Billy the Kid");
 }
