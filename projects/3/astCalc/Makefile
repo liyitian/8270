@@ -9,24 +9,24 @@ OBJS = main.o ast.o parse.tab.o lex.yy.o
 run: $(OBJS)
 	$(CCC) $(CFLAGS) -o run $(OBJS)
 
-main.o: main.cpp parse.y scan.l parse.tab.c lex.yy.c
+main.o: main.cpp parse.y scan.l parse.tab.cpp lex.yy.cpp
 	$(CCC) $(CFLAGS) -c main.cpp
 
-parse.tab.c: parse.y ast.h
-	$(YACC) -d parse.y
+parse.tab.cpp: parse.y ast.h
+	$(YACC) -oparse.tab.cpp -d parse.y
 
 ast.o: ast.cpp ast.h
 	$(CCC) $(CFLAGS) -c ast.cpp
 
-parse.tab.o: parse.tab.c
-	$(CCC) $(CFLAGS) -c parse.tab.c
+parse.tab.o: parse.tab.cpp
+	$(CCC) $(CFLAGS) -c parse.tab.cpp
 
-lex.yy.c: scan.l parse.tab.o
-	$(LEX) scan.l
+lex.yy.cpp: scan.l parse.tab.o
+	$(LEX) -olex.yy.cpp scan.l
 
-lex.yy.o: lex.yy.c
-	$(CCC) $(CFLAGS) $(LEXFLAGS) -c lex.yy.c
+lex.yy.o: lex.yy.cpp
+	$(CCC) $(CFLAGS) $(LEXFLAGS) -c lex.yy.cpp
 	
 clean:
-	rm -f run *.o parse.tab.c lex.yy.c
+	rm -f run *.o parse.tab.cpp lex.yy.cpp
 	rm -f parse.tab.h

@@ -3,7 +3,7 @@
   extern void yyerror(const char *s);
   extern void yyerror(const char *s, const char ch);
 #include "ast.h"
-#include "parse.tab.h"
+#include "parse.tab.hpp"
 %}
 
 %%
