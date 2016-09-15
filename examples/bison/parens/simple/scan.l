@@ -9,7 +9,7 @@
 "("       { return '('; }
 ")"       { return ')'; }
 "\n"      { return CR; }
-.         { ; }
+.         { }
 
 %%
 int yywrap() { return 1; }
