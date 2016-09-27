@@ -1,0 +1,3 @@
+To build a png file:
+
+dot -Tpng graph.gv -o graph.png
