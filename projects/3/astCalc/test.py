@@ -36,5 +36,6 @@ for x in files:
         print "\tTEST CASE FAILED", x
       else :
         print "testcase:", x, "passed"
+        os.system("cat "+testcase)
 
 
