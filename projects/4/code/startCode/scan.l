@@ -256,7 +256,7 @@ printfunction from{spaces}__future__{spaces}import{spaces}print_function
              yyterminate();
            }
 
-<*><<EOF>> { 
+<COMMENT,FULL_COMMENT,RAW_STRING,RAW_STRING2,INDENTING,INITIAL><<EOF>> { 
              BEGIN(FLUSH_INDENT);
              int t = doIndent(0);
              if(t!=0) return iced(t);
