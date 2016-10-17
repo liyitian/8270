@@ -11,7 +11,6 @@
 #include <stack>
 
 #define QUIET
-
 #ifndef QUIET
   #define IWASINTHEAREA(a) {std::cout << #a << std::endl;}
   #define LINENO {std::cout << __LINE__ << std::endl;}
@@ -28,15 +27,15 @@
   int currIndent = 0;
   int encmatching = 0;
 
-  void leftenclose();
-  void rightenclose();
-  void mkSOL();
+  void leftEnclose();
+  void rightEnclose();
+  void makeStartOfLine();
   void renewline();
   int iced(int);
   void displayError(void);
   int doIndent(int);
-  int controlSpaces(const int);
-  int controlChars();
+  int handleSpacesAndIndent(const int);
+  int handleCharsAndIndent();
 %}
 %option yylineno
 
@@ -136,11 +135,11 @@ printfunction from{spaces}__future__{spaces}import{spaces}print_function
 <RAW_STRING2>.           { ; }
 
 <INDENTING>^{spaces} { 
-  int t = controlSpaces(yyleng);
+  int t = handleSpacesAndIndent(yyleng);
   if( t > 0 ) return t;
 }
 <INDENTING>^.        { 
-  int t = controlChars();
+  int t = handleCharsAndIndent();
   if( t > 0 ) return t;
 }
 <INDENTING>^{ws}*{newline} {
@@ -150,10 +149,10 @@ printfunction from{spaces}__future__{spaces}import{spaces}print_function
 {string}   { return(STRING);  }
 
 "\\"{newline}     {  /* throw continuation away */ ;  }
-"("        { leftenclose();  return(LPAR); }
-")"        { rightenclose(); return(RPAR); }
-"["        { leftenclose();  return(LSQB);  }
-"]"        { rightenclose(); return(RSQB); }
+"("        { leftEnclose();  return(LPAR); }
+")"        { rightEnclose(); return(RPAR); }
+"["        { leftEnclose();  return(LSQB);  }
+"]"        { rightEnclose(); return(RSQB); }
 
 ":"        { return(COLON); }
 ","        { return(COMMA); }
@@ -171,8 +170,8 @@ printfunction from{spaces}__future__{spaces}import{spaces}print_function
 "."        { return(DOT); }
 "%"        { return(PERCENT); }
 "`"        { return(BACKQUOTE); }
-"{"        { leftenclose();  return(LBRACE); }
-"}"        { rightenclose(); return(RBRACE); }
+"{"        { leftEnclose();  return(LBRACE); }
+"}"        { rightEnclose(); return(RBRACE); }
 
 "=="       { return(EQEQUAL); }
 "!="       { return(NOTEQUAL); }
@@ -240,7 +239,10 @@ printfunction from{spaces}__future__{spaces}import{spaces}print_function
 {name}     { ++identifiers; return(NAME); }
 
 "^{ws}*"{newline} { BEGIN(INDENTING); }
-{newline}       { BEGIN(INDENTING); if(encmatching <= 0) return(NEWLINE); }
+{newline}         { BEGIN(INDENTING);
+                    if(encmatching <= 0) 
+                      return(NEWLINE); 
+                  }
 
 <FLUSH_INDENT><<EOF>> {
              int t = doIndent(0);
@@ -308,7 +310,7 @@ int doIndent(int thisIndent) {
 
 int iced(int t) { return t<0?DEDENT:INDENT; }
 
-int controlSpaces(const int len){
+int handleSpacesAndIndent(const int len){
   int t = doIndent(len);
   if(t>=0){
     BEGIN(INITIAL);
@@ -318,26 +320,26 @@ int controlSpaces(const int len){
   return t!=0 ? iced(t) : -1; 
 }
 
-int controlChars(){
+int handleCharsAndIndent(){
   int t = doIndent(0); 
   renewline();
   if(t>=0) BEGIN(INITIAL);
   return t!=0 ?  iced(t) : -1;
 }
 
-void mkSOL(){
+void makeStartOfLine(){
   unput('\n'); yyinput();
 }
 
 void renewline(){
   yyless(0);
-  mkSOL();
+  makeStartOfLine();
 }
 
-void leftenclose(){
+void leftEnclose(){
   ++encmatching;
 }
 
-void rightenclose(){
+void rightEnclose(){
   --encmatching;
 }
