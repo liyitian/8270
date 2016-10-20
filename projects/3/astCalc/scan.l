@@ -6,7 +6,14 @@
 #include "parse.tab.hpp"
 %}
 
+%x COMMENT
+
 %%
+"/*"          { BEGIN(COMMENT); }
+<COMMENT>.    { }
+<COMMENT>"\n" { }
+<COMMENT>"*/" { BEGIN(INITIAL); }
+
 "+" |
 "-" |
 "*" |
