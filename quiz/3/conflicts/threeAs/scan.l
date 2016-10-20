@@ -11,6 +11,8 @@
 "b"   { return B;}
 "c"   { return C;}
 "d"   { return D;}
+"x"   { return X;}
+"y"   { return Y;}
 "\n"  { }
 .		  { }
 %%

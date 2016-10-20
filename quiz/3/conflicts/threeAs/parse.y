@@ -3,11 +3,11 @@
 extern int yylex();
 void yyerror(const char * msg) { std::cout << msg << std::endl; }
 %}
-%token A B C D
+%token A B C D X Y
 
 %%
-start   : threeAs B
-        | twoAs C
+start   : threeAs X
+        | twoAs Y
         ;
 
 threeAs : threeAs A A A
