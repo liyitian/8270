@@ -3,7 +3,7 @@ extern int yyparse();
 
 int main() {
   extern int yydebug;
-  yydebug = 0;
+  yydebug = 1;
   if ( yyparse() == 0 ) {
     std::cout << "Syntactically correct." << std::endl;
   }

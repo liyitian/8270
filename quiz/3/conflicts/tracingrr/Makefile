@@ -4,8 +4,7 @@ YACC = bison
 CFLAGS = -Wall
 LEXFLAGS = -Wno-unused
 
-#LEXDEBUG = -d
-LEXDEBUG =
+LEXDEBUG = -d
 YACCDEBUG = -vtd
 
 OBJS = main.o parse.tab.o lex.yy.o
