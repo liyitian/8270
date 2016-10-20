@@ -467,11 +467,7 @@ plus_STRING // Used in: atom, plus_STRING
 	;
 listmaker // Used in: opt_listmaker
 	: test list_for
-	| test star_COMMA_test opt_COMMA
-	;
-opt_COMMA // Used in: listmaker, pick3, varargslist, opt19, opt20, pick_comp_for, pick23, testlist_safe, testlist_comp
-	: COMMA
-	| %empty
+	| test star_COMMA_test
 	;
 testlist_comp // Used in: pick_yield_expr_testlist_comp
 	: test comp_for
@@ -509,9 +505,9 @@ sliceop // Used in: opt_sliceop
 exprlist // Used in: del_stmt, for_stmt, list_for, comp_for
 	: expr star_COMMA_expr
 	;
-testlist // Used in: eval_input, yield_expr, opt_testlist, expr_stmt, pick_yield_expr_testlist, pick_yield_expr_testlist, return_stmt, for_stmt
-	: test star_COMMA_test COMMA
-	| test star_COMMA_test 
+testlist // Used in: expr_stmt, pick_yield_expr_testlist, 
+         // return_stmt, for_stmt, opt_testlist, yield_expr
+	: test star_COMMA_test
 	;
 dictorsetmaker // Used in: opt_dictorsetmaker
 	: test COLON test pick_comp_for
@@ -601,8 +597,9 @@ star_COMMA_fpdef // Used in: varargslist, star_COMMA_fpdef
 	| COMMA
 	| %empty
 	;
-star_COMMA_test // Used in: listmaker, star_COMMA_test, testlist, opt19, pick23, testlist_comp
+star_COMMA_test // Used in: opt_test, listmaker, testlist_comp, testlist, pick_for_test, star_COMMA_test
 	: COMMA test star_COMMA_test
+	| COMMA
 	| %empty
 	;
 star_test_COLON_test // Used in: pick_comp_for, star_test_COLON_test
