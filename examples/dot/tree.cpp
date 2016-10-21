@@ -59,6 +59,8 @@ void Tree::makeGraph() const {
   std::fstream output;
   output.open("graph.gv", std::ios::out);
   output << "digraph G {" << std::endl;
+  output << "node [shape=box,style=filled,color=\".7 .3 1.0\"];";
+  output << std::endl;
   makeGraph(root, output);
   output << "}" << std::endl;
   output.close();

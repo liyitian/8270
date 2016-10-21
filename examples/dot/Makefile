@@ -1,6 +1,6 @@
 # Written by DJ Edmonson
 # Warnings frequently signal eventual errors:
-CXXFLAGS=`sdl-config --cflags` -g -W -Wall -Weffc++ -Wextra -pedantic -O0
+CXXFLAGS= -g -W -Wall -Weffc++ -Wextra -pedantic -O0 -std=c++11
 
 # Linker flags for both OS X and Linux
 LDFLAGS = 

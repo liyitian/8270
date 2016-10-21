@@ -4,7 +4,7 @@
 
 class Node {
 public:
-  Node(int k) : key(k), left(NULL), right(NULL) {}
+  Node(int k) : key(k), left(nullptr), right(nullptr) {}
   Node(int k, Node* l, Node* r) : key(k), left(l), right(r) {}
   int getKey() const { return key; }
   const Node* getLeft() const { return left; }
@@ -19,7 +19,7 @@ private:
 
 class Tree {
 public:
-  Tree() : root(NULL) {}
+  Tree() : root(nullptr) {}
   void insertAt(Node*&, int);
   void buildRandomTree();
   void printTree() const;
