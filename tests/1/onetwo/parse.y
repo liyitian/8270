@@ -7,10 +7,11 @@ void yyerror(const char * msg) { std::cout << msg << std::endl; }
 %%
 
 lines   : lines expr CR
-          { std::cout << "accept" << std::endl; }
+          { std::cout << "Sum is: " << $2 << std::endl; }
         | { ; }
         ;
 
 expr    : ONE expr TWO 
-        |
+          { $$ = $2 + 3; }
+        | { $$ = 0; }
         ;
