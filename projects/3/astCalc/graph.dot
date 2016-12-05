@@ -1,0 +1,32 @@
+digraph G {
+    node [shape=Mrecord];
+    struct1[label="<f0> |<f1> -|<f2> "];
+    struct2[label="<f0> |<f1> +|<f2> "];
+    struct1:f0 -> struct2:f1;
+    struct4[label="<f0> -|<f1> "];
+    struct2:f0 -> struct4:f0;
+    struct8[label="<f0> 17"];
+    struct4:f0 -> struct8:f0;
+    struct5[label="<f0> |<f1> *|<f2> "];
+    struct2:f2 -> struct5:f1;
+    struct10[label="<f0> 2"];
+    struct5:f0 -> struct10:f0;
+    struct11[label="<f0> (|<f1> |<f2> )"];
+    struct5:f2 -> struct11:f1;
+    struct22[label="<f0> |<f1> +|<f2> "];
+    struct11:f1 -> struct22:f1;
+    struct44[label="<f0> 3"];
+    struct22:f0 -> struct44:f0;
+    struct45[label="<f0> 4"];
+    struct22:f2 -> struct45:f0;
+    struct3[label="<f0> |<f1> /|<f2> "];
+    struct1:f2 -> struct3:f1;
+    struct6[label="<f0> |<f1> *|<f2> "];
+    struct3:f0 -> struct6:f1;
+    struct12[label="<f0> 2"];
+    struct6:f0 -> struct12:f0;
+    struct13[label="<f0> 3"];
+    struct6:f2 -> struct13:f0;
+    struct7[label="<f0> 4"];
+    struct3:f2 -> struct7:f0;
+}
