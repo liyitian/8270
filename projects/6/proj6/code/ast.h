@@ -244,7 +244,7 @@ public:
         std::cout << val << std::endl;
       }
   }
-}
+};
 
 class AssignNode : public AstNode {
 public:
@@ -253,14 +253,25 @@ public:
   virtual ~AssignNode(){}
   void eval()
   {
-    double leftVal=AstNode::getLeft()->eval();
-    return leftVal;
+    double val=AstNode::getRight()->eval();
+    SymbolTableManager::getInstance().getScope()->addSymbol(AstNode::getLeft()->getLabel(), AstNode::getRight());
   }
-}
+};
+
 class SuiteNode : public AstNode {
 public:
-  SuiteNode(std::string) : AstNode(nullptr,nullptr),
-}
+  SuiteNode(std::vector<AstNode *> v;) : AstNode(nullptr,nullptr),stmts(v){
+  }
+  virtual ~SuiteNode(){}
+  void eval(){
+    double val;
+    for(i=0;i<stmts.size();i++){
+      stmts[i]->eval();
+    }
+  }
+private:
+  std::vector<AstNode*> stmts;
+};
 
 
 #endif

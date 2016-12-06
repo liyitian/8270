@@ -95,9 +95,14 @@ decorated // Used in: compound_stmt
 	| decorators funcdef
 	;
 funcdef // Used in: decorated, compound_stmt
-	: DEF NAME parameters COLON suite
-	{
-		
+	: DEF NAME {scopelevel++} parameters COLON suite
+	{	
+		scopelevel--;
+		std::string str = std::string($2);
+        delete $2; 
+		SymbolTableManager stm* =SymbolTableManager::getinstance();
+		stm->getScope()->addSymbol(str,$6)
+
 	}
 	;
 parameters // Used in: funcdef
@@ -196,8 +201,8 @@ expr_stmt // Used in: small_stmt
 	}
 	| testlist star_EQUAL 
 	{
-		$1->setVal($2->eval());
-		$1->setType($2->getType());
+		$$= new AssignNode($1,$2);
+
 	}
 	;
 pick_yield_expr_testlist // Used in: expr_stmt, star_EQUAL
@@ -423,9 +428,15 @@ suite // Used in: funcdef, if_stmt, star_ELIF, while_stmt, for_stmt,
       // try_stmt, plus_except, opt_ELSE, opt_FINALLY, with_stmt, classdef
 	: simple_stmt
 	| NEWLINE INDENT plus_stmt DEDENT
+	{
+		$$=new SuiteNode($3);
+	}
 	;
 plus_stmt // Used in: suite, plus_stmt
 	: stmt plus_stmt
+	{
+		$1->push_back($2);
+	}
 	| stmt
 	;
 testlist_safe // Used in: list_for
