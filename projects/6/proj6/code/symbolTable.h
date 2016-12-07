@@ -9,14 +9,15 @@
 
 #include <unordered_map>
 #include "ast.h"
+class AstNode;
 
 class SymbolTable
 {
 public:
     
     ~SymbolTable(){ 
-        for(auto i: table)
-            delete i.second;
+        // for(auto i: table)
+        //     delete i.second;
     }
 
     void addSymbol(std::string str, AstNode* ast)

@@ -2,24 +2,27 @@
 %{
   #include <iostream>
   #include <cmath>
+  #include <algorithm>
   #include <iomanip>
-  #include "symbolTable.h"
   #include "symbolTableManager.h"
-
+  #include "astchild.h"
 
 	int yylex (void);
 	extern int yylineno;
 	extern char *yytext;
-	void yyerror (char const *);
 	int scopelevel = 0;
+	int ExeNow=0;
+	void yyerror (char const *);
+
+
 %}
 
 %union{
 	AstNode * ast;
 	double d;
 	int i;
-	char *c;
-	std::vector<Ast *>* vec;
+	char* c;
+	std::vector<AstNode*>* vec;
 }
 
 // 83 tokens, in alphabetical order:
@@ -39,11 +42,15 @@
 
 %type <ast> opt_test arith_expr term factor power atom opt_yield_test opt_test_2 plus_COMMA_test
 %type <ast> star_COMMA_test test or_test and_test not_test comparison expr xor_expr and_expr shift_expr
-%type <ast> lambdef pick_yield_expr_testlist star_EQUAL testlist yield_expr
+%type <ast> lambdef pick_yield_expr_testlist star_EQUAL testlist yield_expr suite simple_stmt NEWLINE
+%type <ast> small_stmt small_stmt_STAR_OR_SEMI print_stmt pass_stmt del_stmt flow_stmt import_stmt
+%type <ast> global_stmt exec_stmt stmt raise_stmt return_stmt break_stmt continue_stmt compound_stmt
+%type <ast> expr_stmt assert_stmt while_stmt if_stmt exprlist try_stmt with_stmt yield_stmt star_trailer funcdef
 %type <vec> plus_stmt
-%type <i> NUMBER print_stmt pick_PLUS_MINUS pick_multop pick_unop PLUS SLASH PERCENT TILDE MINUS LEFTSHIFT RIGHTSHIFT
+%type <i> NUMBER pick_PLUS_MINUS pick_multop pick_unop PLUS SLASH PERCENT TILDE MINUS LEFTSHIFT RIGHTSHIFT
 %type <i> augassign PLUSEQUAL MINEQUAL STAREQUAL PERCENTEQUAL AMPEREQUAL VBAREQUAL CIRCUMFLEXEQUAL LEFTSHIFTEQUAL 
 %type <i> DOUBLESTAREQUAL DOUBLESLASHEQUAL SLASHEQUAL RIGHTSHIFTEQUAL NOT AND
+%type <i> PASS DEF DEL RETURN RAISE SEMI TRY WHILE 
 %type <d> FLOAT 
 %type <c> NAME
 
@@ -100,9 +107,12 @@ funcdef // Used in: decorated, compound_stmt
 		scopelevel--;
 		std::string str = std::string($2);
         delete $2; 
-		SymbolTableManager stm* =SymbolTableManager::getinstance();
-		stm->getScope()->addSymbol(str,$6)
-
+        $6->setName(str);
+        if (scopelevel==0){
+			SymbolTableManager stm* =SymbolTableManager::getinstance();
+			stm->getScope()->addSymbol(str,$6);
+		}
+		$$=$6;
 	}
 	;
 parameters // Used in: funcdef
@@ -157,52 +167,41 @@ small_stmt // Used in: simple_stmt, small_stmt_STAR_OR_SEMI
 expr_stmt // Used in: small_stmt
 	: testlist augassign pick_yield_expr_testlist 
 	{
-	  int flag = ($1->getType()=='d' || $3->getType()=='d')?1:0;  
-  	  flag?$1->setType('d'):$1->setType('i');
-  	  double leftValue = $1->eval();
-  	  double rightValue = $3->eval();
   	  switch($2){
   	  	case PLUSEQUAL:
-  	  		leftValue +=rightValue;
+  	  		$$= new PlusEqualNode($1,$3);
   	  		break;
 
   	  	case MINEQUAL:
-  	  		leftValue -=rightValue;
+  	  		
   	  		break;
 
   	  	case STAREQUAL:
-  	  		leftValue *=rightValue;
+
   	  		break;
 
   	  	case SLASHEQUAL:
-  	  		if (rightValue==0){
-  	  			std::cerr << "divide number can not be zero!" <<std::endl;
-  	  			exit(0);
-  	  		}
-  	  		leftValue /=rightValue;
+
   	  		break;
 
   	  	case PERCENTEQUAL:
-  	  		leftValue = leftValue - rightValue*floor(leftValue/rightValue);
+  	  		
   	  		break;
 
   	  	case DOUBLESLASHEQUAL:
-  	  		$1->setType('i');
-  	  		leftValue =floor(leftValue/rightValue);
+
   	  		break;
 
   	  	default:
   	  		break;
   	  }
-  	  if (flag==0)
-  	  	$1->setVal((int)leftValue);
-  	  else
-  	  	$1->setVal(leftValue);
+  	  if (scopelevel==0) $$->eval();
 	}
 	| testlist star_EQUAL 
 	{
 		$$= new AssignNode($1,$2);
-
+		if (scopelevel==0)
+			SymbolTableManager::getInstance().addSymbol($1->getName(),$2);
 	}
 	;
 pick_yield_expr_testlist // Used in: expr_stmt, star_EQUAL
@@ -214,7 +213,10 @@ star_EQUAL // Used in: expr_stmt, star_EQUAL
 	{
 		$$=$2;
 	}
-	| %empty {}
+	| %empty 
+	{
+		$$=nullptr;
+	}
 	;
 augassign // Used in: expr_stmt
 	: PLUSEQUAL
@@ -249,10 +251,14 @@ augassign // Used in: expr_stmt
 	}
 	;
 print_stmt // Used in: small_stmt
-	: PRINT opt_test
-    { //std::cout << "IN PRINT\n" ;
-	    $$=new PrintNode($2);
-	    
+	: PRINT {ExeNow++;} opt_test
+    { 
+    	ExeNow--;
+	    $$=new PrintNode($3);
+	    if (scopelevel==0){
+	    	$$->eval();
+	    }
+	}
 	| PRINT RIGHTSHIFT test opt_test_2 {}
 	;
 opt_test // Used in: print_stmt
@@ -267,10 +273,10 @@ opt_test_2 // Used in: print_stmt
 	| %empty {}
 	;
 del_stmt // Used in: small_stmt
-	: DEL exprlist
+	: DEL exprlist {}
 	;
 pass_stmt // Used in: small_stmt
-	: PASS
+	: PASS {}
 	;
 flow_stmt // Used in: small_stmt
 	: break_stmt
@@ -280,21 +286,24 @@ flow_stmt // Used in: small_stmt
 	| yield_stmt
 	;
 break_stmt // Used in: flow_stmt
-	: BREAK
+	: BREAK {}
 	;
 continue_stmt // Used in: flow_stmt
-	: CONTINUE
+	: CONTINUE {}
 	;
 return_stmt // Used in: flow_stmt
-	: RETURN testlist
-	| RETURN
+	: RETURN testlist 
+	{
+		$$=new ReturnNode($2);
+	}
+	| RETURN {}
 	;
 yield_stmt // Used in: flow_stmt
 	: yield_expr
 	;
 raise_stmt // Used in: flow_stmt
-	: RAISE test opt_test_3
-	| RAISE
+	: RAISE test opt_test_3 {}
+	| RAISE {}
 	;
 opt_COMMA_test // Used in: opt_test_3, exec_stmt
 	: COMMA test
@@ -305,8 +314,8 @@ opt_test_3 // Used in: raise_stmt
 	| %empty
 	;
 import_stmt // Used in: small_stmt
-	: import_name
-	| import_from
+	: import_name {}
+	| import_from {}
 	;
 import_name // Used in: import_stmt
 	: IMPORT dotted_as_names
@@ -348,46 +357,58 @@ dotted_name // Used in: decorator, import_from, dotted_as_name, dotted_name
 	| dotted_name DOT NAME
 	;
 global_stmt // Used in: small_stmt, global_stmt
-	: global_stmt COMMA NAME
+	: global_stmt COMMA NAME 
+	{
+		std::string str=std::string($3);
+		delete $3;
+		$1->addName($3);
+		$$=$1;
+	}
 	| GLOBAL NAME
+	{
+		std::string str=std::string($2);
+		delete $2;
+		$$=new GlobalNode();
+		$$->addName(str);
+	}
 	;
 exec_stmt // Used in: small_stmt
-	: EXEC expr IN test opt_COMMA_test
-	| EXEC expr
+	: EXEC expr IN test opt_COMMA_test {}
+	| EXEC expr {}
 	;
 assert_stmt // Used in: small_stmt
-	: ASSERT test COMMA test
-	| ASSERT test
+	: ASSERT test COMMA test {}
+	| ASSERT test {}
 	;
 compound_stmt // Used in: single_input, stmt
 	: if_stmt
 	| while_stmt
-	| for_stmt
+	| for_stmt {}
 	| try_stmt
 	| with_stmt
-	| funcdef
-	| classdef
-	| decorated
+	| funcdef {}
+	| classdef {}
+	| decorated {}
 	;
 if_stmt // Used in: compound_stmt
-	: IF test COLON suite star_ELIF ELSE COLON suite
-	| IF test COLON suite star_ELIF
+	: IF test COLON suite star_ELIF ELSE COLON suite {}
+	| IF test COLON suite star_ELIF {}
 	;
 star_ELIF // Used in: if_stmt, star_ELIF
 	: ELIF test COLON suite star_ELIF
 	| %empty
 	;
 while_stmt // Used in: compound_stmt
-	: WHILE test COLON suite ELSE COLON suite
-	| WHILE test COLON suite
+	: WHILE test COLON suite ELSE COLON suite {}
+	| WHILE test COLON suite {}
 	;
 for_stmt // Used in: compound_stmt
 	: FOR exprlist IN testlist COLON suite ELSE COLON suite
 	| FOR exprlist IN testlist COLON suite
 	;
 try_stmt // Used in: compound_stmt
-	: TRY COLON suite plus_except opt_ELSE opt_FINALLY
-	| TRY COLON suite FINALLY COLON suite
+	: TRY COLON suite plus_except opt_ELSE opt_FINALLY {}
+	| TRY COLON suite FINALLY COLON suite {}
 	;
 plus_except // Used in: try_stmt, plus_except
 	: except_clause COLON suite plus_except
@@ -402,7 +423,7 @@ opt_FINALLY // Used in: try_stmt
 	| %empty
 	;
 with_stmt // Used in: compound_stmt
-	: WITH with_item star_COMMA_with_item COLON suite
+	: WITH with_item star_COMMA_with_item COLON suite {}
 	;
 star_COMMA_with_item // Used in: with_stmt, star_COMMA_with_item
 	: COMMA with_item star_COMMA_with_item
@@ -436,8 +457,12 @@ plus_stmt // Used in: suite, plus_stmt
 	: stmt plus_stmt
 	{
 		$1->push_back($2);
+		$$=$1;
 	}
-	| stmt
+	| stmt{
+		$$= new std::vector<AstNode*>;
+		$$.push_back($1);
+	}
 	;
 testlist_safe // Used in: list_for
 	: old_test plus_COMMA_old_test
@@ -470,7 +495,7 @@ or_test // Used in: old_test, test, opt_IF_ELSE, or_test, comp_for
 	| or_test OR and_test
 	;
 and_test // Used in: or_test, and_test
-	: not_test
+	: not_test 
 	| and_test AND not_test
 	;
 not_test // Used in: and_test, not_test
@@ -617,14 +642,23 @@ pick_unop // Used in: factor
 	;
 power // Used in: factor
 	: atom star_trailer DOUBLESTAR factor
-		{
+	{
 		$$=new PowNode($1,$4);
+	}
+	| atom star_trailer 
+	{
+		if ($2!=nullptr){
+			$$ = new FuncNode($1->getName());
+			if(scopelevel==0 && ExeNow==0){
+				$$->eval();
+			}
 		}
-	| atom star_trailer
+		else $$=$1;
+	}
 	;
 star_trailer // Used in: power, star_trailer
-	: trailer star_trailer
-	| %empty
+	: trailer star_trailer {}
+	| %empty {$$=nullptr;}
 	;
 atom // Used in: power
 	: LPAR opt_yield_test RPAR
@@ -854,9 +888,9 @@ arglist_postlist // Used in: arglist, arglist_postlist
 	| argument
 	;
 small_stmt_STAR_OR_SEMI // Used in: simple_stmt, small_stmt_STAR_OR_SEMI
-	: SEMI small_stmt small_stmt_STAR_OR_SEMI
-	| SEMI
-	| %empty
+	: SEMI small_stmt small_stmt_STAR_OR_SEMI {}
+	| SEMI {}
+	| %empty {}
 	;
 
 %%
