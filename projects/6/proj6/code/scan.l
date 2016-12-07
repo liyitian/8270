@@ -31,6 +31,7 @@
  */
 
 #include "ast.h"
+#include <vector>
 #include "parse.tab.h"
 #include <stack>
 

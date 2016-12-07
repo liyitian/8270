@@ -1,7 +1,7 @@
 CCC = g++
 LEX = flex
 YACC = bison
-CFLAGS = -Wall -std=c++11
+CFLAGS = -Wall -std=c++11 -g
 LEXFLAGS = -Wno-unused
 
 #LEXDEBUG = -d

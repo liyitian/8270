@@ -10,7 +10,11 @@ public:
   AstNumber(char datatype, double n) : AstNode(datatype), number(n) 
   {
     AstNode::setType(datatype);
+    std::ostringstream os;
+    os<<n;
+    AstNode::setName(os.str());
   } 
+  void setName(std::string name){Ast::setName(name);}
   void setVal(double num){number=num;}
   double eval(){
     bool isNum=(AstNode::getType()=='i'||AstNode::getType()=='d');

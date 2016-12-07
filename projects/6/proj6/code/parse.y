@@ -4,27 +4,23 @@
   #include <cmath>
   #include <algorithm>
   #include <iomanip>
-  #include "symbolTableManager.h"
-  #include "astchild.h"
-
+  #include "symbolTableManager.h" 
+  #include "astchild.h" 
 	int yylex (void);
 	extern int yylineno;
 	extern char *yytext;
-	int scopelevel = 0;
-	int ExeNow=0;
+    int scopelevel = 0;
+    int ExeNow= 0;// decide where to exe func
 	void yyerror (char const *);
-
-
 %}
 
 %union{
-	AstNode * ast;
-	double d;
-	int i;
-	char* c;
-	std::vector<AstNode*>* vec;
+    AstNode* ast;
+    double d;
+    int i;
+    char* c;
+    std::vector<AstNode*>* vec;
 }
-
 // 83 tokens, in alphabetical order:
 %token AMPEREQUAL AMPERSAND AND AS ASSERT AT BACKQUOTE BAR BREAK
 %token CIRCUMFLEX CIRCUMFLEXEQUAL CLASS COLON COMMA CONTINUE DEDENT
@@ -45,8 +41,8 @@
 %type <ast> lambdef pick_yield_expr_testlist star_EQUAL testlist yield_expr suite simple_stmt NEWLINE
 %type <ast> small_stmt small_stmt_STAR_OR_SEMI print_stmt pass_stmt del_stmt flow_stmt import_stmt
 %type <ast> global_stmt exec_stmt stmt raise_stmt return_stmt break_stmt continue_stmt compound_stmt
-%type <ast> expr_stmt assert_stmt while_stmt if_stmt exprlist try_stmt with_stmt yield_stmt star_trailer funcdef
-%type <vec> plus_stmt
+%type <ast> expr_stmt assert_stmt while_stmt if_stmt exprlist try_stmt with_stmt yield_stmt star_trailer funcdef 
+%type <vec> plus_stmt 
 %type <i> NUMBER pick_PLUS_MINUS pick_multop pick_unop PLUS SLASH PERCENT TILDE MINUS LEFTSHIFT RIGHTSHIFT
 %type <i> augassign PLUSEQUAL MINEQUAL STAREQUAL PERCENTEQUAL AMPEREQUAL VBAREQUAL CIRCUMFLEXEQUAL LEFTSHIFTEQUAL 
 %type <i> DOUBLESTAREQUAL DOUBLESLASHEQUAL SLASHEQUAL RIGHTSHIFTEQUAL NOT AND
@@ -77,9 +73,6 @@ file_input // Used in: start
 pick_NEWLINE_stmt // Used in: star_NEWLINE_stmt
 	: NEWLINE
 	| stmt
-	{
-		
-	}
 	;
 star_NEWLINE_stmt // Used in: file_input, star_NEWLINE_stmt
 	: pick_NEWLINE_stmt star_NEWLINE_stmt
@@ -102,12 +95,12 @@ decorated // Used in: compound_stmt
 	| decorators funcdef
 	;
 funcdef // Used in: decorated, compound_stmt
-	: DEF NAME {scopelevel++} parameters COLON suite
+	: DEF NAME {scopelevel++;} parameters COLON suite
 	{	
 		scopelevel--;
 		std::string str = std::string($2);
-        delete $2; 
-        $6->setName(str);
+		delete $2;
+		$6->setName(str);
         if (scopelevel==0){
 			SymbolTableManager stm* =SymbolTableManager::getinstance();
 			stm->getScope()->addSymbol(str,$6);
